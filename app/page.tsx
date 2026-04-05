@@ -12,7 +12,7 @@ export default function Page() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycby1m5f1-aalE9t5CIgVHvVTT6x27wMI3CdyzSYyYkDigC7J4VLweV9rLvz0hX-bWr9y4w/exec";
+  const GAS_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMXpdElqKgbdNq7C5SiSr46KUpN80i6bSgwKcI3awqmjieOA0hSNABXUnnE_sS0qRG5rWIreczdmP6NHIFln5lCxR0uXO1uHbkNAjQH1fOFBYhgsTdu1ftqWgUQ1ShyC3PeLuT7nGZExAi8L_N1h3PGdwrHsH2wDlmmNlNOc9i-pKv2yPxZgW28-EPhn691Pfk2Ppi92xCB8T5HIQhHEWRm2u8oLGVr_4ovjeCyFCHlMi0V9GfDgbp0Lha13WhH1oMfJ-iLyrhTIGLs2CLwsgfyRNYLG3Q&lib=MNyNcv_qMnCu0mlCuA1J48nJa9p4FWqyd";
 
   const fetchSlots = async () => {
     try {
