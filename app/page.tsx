@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +12,7 @@ export default function Page() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const GAS_URL = "https://InitialN.vercel.app"; // ←変更
+  const GAS_URL = "https://script.google.com/macros/s/XXXXX/exec";
 
   const fetchSlots = async () => {
     try {
