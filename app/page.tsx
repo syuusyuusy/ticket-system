@@ -12,7 +12,7 @@ export default function Page() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const GAS_URL = "https://script.google.com/macros/s/XXXXX/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycby1m5f1-aalE9t5CIgVHvVTT6x27wMI3CdyzSYyYkDigC7J4VLweV9rLvz0hX-bWr9y4w/exec";
 
   const fetchSlots = async () => {
     try {
