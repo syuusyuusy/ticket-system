@@ -1,6 +1,6 @@
 export default async function Page() {
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbxs4xGV9-QLNqOY3Syn5T44SSf55F2GWU4TmfEIIVLa/dev", {
+    const res = await fetch("https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMWdzCMvI8XUMZB9L25pgoAl9Pu3o35ZMvK1SeSh9GBn2OC642YtaM78cv8jwR5AsU7DP2HTuFRyNS_G2JCQAVNvECdR4R48yBPsjms-5602VZN52rLtQSZjEnXMSa-1G0hxXOiWlfbIy0dHVWH2o32Adq7PjneCwyFT5MpiBmEzTR_oA_ySWg8qrLM_FRHh1j4qhnDcoraH4dsQhRhVCgaShmIgKZfhaXhybhE2IbfzJdRxdhxFW573iItA1ngrCuZ_8z1Z2TOS29z7Tp_0XDBzFPXJBg&lib=MNyNcv_qMnCu0mlCuA1J48nJa9p4FWqyd", {
       cache: "no-store",
     });
 
