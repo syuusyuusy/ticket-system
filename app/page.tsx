@@ -1,39 +1,50 @@
-export default async function Page() {
-  try {
-    const res = await fetch("https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMWdzCMvI8XUMZB9L25pgoAl9Pu3o35ZMvK1SeSh9GBn2OC642YtaM78cv8jwR5AsU7DP2HTuFRyNS_G2JCQAVNvECdR4R48yBPsjms-5602VZN52rLtQSZjEnXMSa-1G0hxXOiWlfbIy0dHVWH2o32Adq7PjneCwyFT5MpiBmEzTR_oA_ySWg8qrLM_FRHh1j4qhnDcoraH4dsQhRhVCgaShmIgKZfhaXhybhE2IbfzJdRxdhxFW573iItA1ngrCuZ_8z1Z2TOS29z7Tp_0XDBzFPXJBg&lib=MNyNcv_qMnCu0mlCuA1J48nJa9p4FWqyd", {
-      cache: "no-store",
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function Page() {
+  const [slots, setSlots] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("GASのURL")
+      .then(res => res.json())
+      .then(data => setSlots(data));
+  }, []);
+
+  const reserve = async (time: string) => {
+    await fetch("GASのURL", {
+      method: "POST",
+      body: JSON.stringify({ time_slot: time }),
     });
 
-    if (!res.ok) {
-      throw new Error("fetch failed");
-    }
+    alert("予約しました");
 
-    const data = await res.json();
+    // 再読み込み（最新状態取得）
+    location.reload();
+  };
 
-    return (
-      <div style={{ padding: "20px" }}>
-        <h1>予約可能な時間</h1>
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>予約可能な時間</h1>
 
-        {data.length === 0 ? (
-          <p>現在空きはありません</p>
-        ) : (
-          <ul>
-            {data.map((item: any, i: number) => (
-              <li key={i}>
-                {item.time_slot}（残り{item.remaining}人）
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
+      {slots.length === 0 ? (
+        <p>現在空きはありません</p>
+      ) : (
+        <ul>
+          {slots.map((item, i) => (
+            <li key={i}>
+              {item.time_slot.slice(0, 5)}（残り{item.remaining}人）
 
-  } catch (e) {
-    return (
-      <div style={{ padding: "20px" }}>
-        <h1>エラー発生</h1>
-        <p>データ取得に失敗しました</p>
-      </div>
-    );
-  }
+              <button
+                onClick={() => reserve(item.time_slot)}
+                style={{ marginLeft: "10px" }}
+              >
+                予約
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
