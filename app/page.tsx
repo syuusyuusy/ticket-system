@@ -6,7 +6,7 @@ export default function Page() {
   const [slots, setSlots] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("https://script.google.com/macros/s/AKfycbzKiw27VfA2g-Zg8KZzm4WvqHOsod5aV0CWgKi2xZXh0gLvMhglDysx-1pL1yRwoHPnQA/exec")
+    fetch("https://script.google.com/macros/s/AKfycbyJkTD_ig2xLC3HbIA0rcZTWibFg3RwlpK_SHauWRvEYaAffoAoA68mxAPdJcp73pIHlA/exec")
       .then(res => res.json())
       .then(data => setSlots(data));
   }, []);
