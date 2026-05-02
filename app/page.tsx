@@ -6,13 +6,13 @@ export default function Page() {
   const [slots, setSlots] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("https://script.google.com/macros/s/AKfycbyJkTD_ig2xLC3HbIA0rcZTWibFg3RwlpK_SHauWRvEYaAffoAoA68mxAPdJcp73pIHlA/exec")
+    fetch("https://script.google.com/macros/s/AKfycbw4ljJo3oCxvzK62WXboP-Tf0031XQ5mSGNv9WIo8n2InTfrcJt_oZh8wAfIkxvyP5s/exec")
       .then(res => res.json())
       .then(data => setSlots(data));
   }, []);
 
   const reserve = async (time: string) => {
-    await fetch("GASのURL", {
+    await fetch("https://script.google.com/macros/s/AKfycbw4ljJo3oCxvzK62WXboP-Tf0031XQ5mSGNv9WIo8n2InTfrcJt_oZh8wAfIkxvyP5s/exec", {
       method: "POST",
       body: JSON.stringify({ time_slot: time }),
     });
