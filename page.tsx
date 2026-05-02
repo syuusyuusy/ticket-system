@@ -1,5 +1,5 @@
 export default async function Page() {
-  const res = await fetch("https://script.google.com/macros/s/AKfycbzKiw27VfA2g-Zg8KZzm4WvqHOsod5aV0CWgKi2xZXh0gLvMhglDysx-1pL1yRwoHPnQA/exec", {
+  const res = await fetch("https://script.google.com/macros/s/AKfycbyJkTD_ig2xLC3HbIA0rcZTWibFg3RwlpK_SHauWRvEYaAffoAoA68mxAPdJcp73pIHlA/exec", {
     cache: "no-store",
   });
 
