@@ -53,7 +53,7 @@ export default function Page() {
     if (!ok) return;
 
     try {
-      const res = await fetch(GAS_URL, {
+      const res = await fetch("/api/reserve", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
