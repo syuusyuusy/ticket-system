@@ -11,69 +11,76 @@ export default function Page() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ← ここを自分のGAS URLに変更
-  const GAS_URL =
-    "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQh_C1Cdud0qSMYVimg0tbWZgdQ60ylYFf2MfD8FglTMoisUb8f06Gm5ZlP9qHybFvilQEqsoyzRmVV1jK_oJvDOgqFna0OtxFV7ecPidJpcrh5rlAARalc5kxvBjpu3ZizdI1gMRggqohbEGeDC-Bcyf1UPs4aNHmWmUnGkZKZhWLqke8DRiWW6LayZdKH1B3PZ53BzTufUwZvzyxcBDbz_l1SHPvt2_q3LaiaHLUgbmnx-55K7m3dbTTHXMSP0PQLC2Mfj5qa3VdMpxOe2zx9CNaJAw&lib=MNyNcv_qMnCu0mlCuA1J48nJa9p4FWqyd";
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("");
 
-  // 空き状況取得
+  const [nickname, setNickname] = useState("");
+  const [groupSize, setGroupSize] = useState(1);
+
+  const GAS_URL =
+    "https://script.google.com/macros/s/AKfycbw4ljJo3oCxvzK62WXboP-Tf0031XQ5mSGNv9WIo8n2InTfrcJt_oZh8wAfIkxvyP5s/exec";
+
   const loadSlots = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch(GAS_URL, {
-        method: "GET",
-      });
-
+      const res = await fetch(GAS_URL);
       const data = await res.json();
-
-      console.log("取得データ:", data);
 
       if (Array.isArray(data)) {
         setSlots(data);
       } else {
         setSlots([]);
       }
-    } catch (error) {
-      console.error("取得失敗:", error);
+
+    } catch (e) {
+      console.error(e);
       setSlots([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 初回読み込み
   useEffect(() => {
     loadSlots();
   }, []);
 
-  // 予約処理
-  const reserve = async (time: string) => {
-    const ok = confirm(`${time.slice(0, 5)} を予約しますか？`);
+  // モーダル開く
+  const openReserveModal = (time: string) => {
+    setSelectedTime(time);
+    setNickname("");
+    setGroupSize(1);
+    setShowModal(true);
+  };
 
-    if (!ok) return;
+  // 予約確定
+  const reserve = async () => {
+    if (!nickname.trim()) {
+      alert("ニックネームを入力してください");
+      return;
+    }
 
     try {
-      const res = await fetch("/api/reserve", {
+      await fetch("/api/reserve", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          time_slot: time,
+          time_slot: selectedTime,
+          nickname,
+          group_size: groupSize,
         }),
       });
 
-      const result = await res.text();
-
-      console.log(result);
-
       alert("予約完了！");
 
-      // 最新状態再取得
+      setShowModal(false);
+
       loadSlots();
 
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       alert("予約失敗");
     }
   };
@@ -82,7 +89,7 @@ export default function Page() {
     <main
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f3f4f6",
+        background: "#f3f4f6",
         padding: "20px",
         fontFamily: "sans-serif",
       }}
@@ -104,38 +111,29 @@ export default function Page() {
           整理券予約
         </h1>
 
-        {/* 読み込み中 */}
-        {loading && (
+        {loading ? (
           <div
             style={{
               background: "white",
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             読み込み中...
           </div>
-        )}
-
-        {/* 空きなし */}
-        {!loading && slots.length === 0 && (
+        ) : slots.length === 0 ? (
           <div
             style={{
               background: "white",
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             現在空きはありません
           </div>
-        )}
-
-        {/* 一覧 */}
-        {!loading &&
+        ) : (
           slots.map((item, index) => (
             <div
               key={index}
@@ -144,7 +142,6 @@ export default function Page() {
                 borderRadius: "16px",
                 padding: "20px",
                 marginBottom: "16px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -163,7 +160,6 @@ export default function Page() {
                 <div
                   style={{
                     color: "#666",
-                    marginTop: "4px",
                   }}
                 >
                   残り {item.remaining} 人
@@ -171,22 +167,168 @@ export default function Page() {
               </div>
 
               <button
-                onClick={() => reserve(item.time_slot)}
+                onClick={() => openReserveModal(item.time_slot)}
                 style={{
-                  backgroundColor: "#2563eb",
+                  background: "#2563eb",
                   color: "white",
                   border: "none",
                   borderRadius: "12px",
                   padding: "12px 20px",
-                  fontSize: "16px",
                   cursor: "pointer",
                 }}
               >
                 予約
               </button>
             </div>
-          ))}
+          ))
+        )}
       </div>
+
+      {/* モーダル */}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: "20px",
+              padding: "24px",
+              width: "100%",
+              maxWidth: "400px",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "24px",
+                marginBottom: "20px",
+              }}
+            >
+              {selectedTime.slice(0, 5)} の予約
+            </h2>
+
+            {/* ニックネーム */}
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "8px" }}>
+                ニックネーム
+              </div>
+
+              <input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="名前を入力"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            {/* 人数 */}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ marginBottom: "8px" }}>
+                人数
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    setGroupSize(Math.max(1, groupSize - 1))
+                  }
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "999px",
+                    border: "none",
+                    background: "#ddd",
+                    fontSize: "24px",
+                  }}
+                >
+                  -
+                </button>
+
+                <div
+                  style={{
+                    fontSize: "24px",
+                    minWidth: "40px",
+                    textAlign: "center",
+                  }}
+                >
+                  {groupSize}
+                </div>
+
+                <button
+                  onClick={() => setGroupSize(groupSize + 1)}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "999px",
+                    border: "none",
+                    background: "#2563eb",
+                    color: "white",
+                    fontSize: "24px",
+                  }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* ボタン */}
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+              }}
+            >
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  flex: 1,
+                  padding: "14px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: "#ddd",
+                }}
+              >
+                キャンセル
+              </button>
+
+              <button
+                onClick={reserve}
+                style={{
+                  flex: 1,
+                  padding: "14px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: "#2563eb",
+                  color: "white",
+                }}
+              >
+                予約確定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
