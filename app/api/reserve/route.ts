@@ -2,14 +2,17 @@ export async function POST(
   req: Request
 ) {
 
+  // GASのexec URL
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycby_CYCOok9ozm2Kg_bGoCi1NneqrX1Wfw2CkXZaTwymRqPwCDf27AImxPN3bAL_UzUOEA/exec";
+    "https://script.google.com/macros/s/AKfycbwdzhQxJDtsoHfK78SB67aA6Btwze-2aE0E7m90mvykZ_j3upDdxR37MP31H3RGSCxs_A/exec";
 
   try {
 
+    // フロントから受信
     const body =
       await req.json();
 
+    // GASへ転送
     const gasRes =
       await fetch(
         GAS_URL,
@@ -23,11 +26,16 @@ export async function POST(
         }
       );
 
+    // GASレスポンス取得
     const text =
       await gasRes.text();
 
-    console.log(text);
+    console.log(
+      "GAS RESPONSE:",
+      text
+    );
 
+    // そのまま返却
     return new Response(
       text,
       {
