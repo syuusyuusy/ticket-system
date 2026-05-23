@@ -8,48 +8,73 @@ type Slot = {
 };
 
 export default function Page() {
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const [showModal, setShowModal] = useState(false);
+  const [slots, setSlots] =
+    useState<Slot[]>([]);
 
-  const [selectedTime, setSelectedTime] = useState("");
-  const [remaining, setRemaining] = useState(0);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [nickname, setNickname] = useState("");
-  const [groupSize, setGroupSize] = useState(1);
+  const [showModal, setShowModal] =
+    useState(false);
 
-  const [submitting, setSubmitting] = useState(false);
+  const [selectedTime, setSelectedTime] =
+    useState("");
 
-  // 自分のGAS URL
+  const [remaining, setRemaining] =
+    useState(0);
+
+  const [nickname, setNickname] =
+    useState("");
+
+  const [groupSize, setGroupSize] =
+    useState(1);
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  // GAS URL
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbwpdEk6rrGHsXW5WwyMRk2ggpULqNT3-WcJYTYFV5oK5QsDiAnAqGH2cGcoUWfAvjK8hQ/exec";
+    "ここにGASのexec URL";
 
   // 空き状況取得
   const loadSlots = async () => {
+
     try {
+
       setLoading(true);
 
-      const res = await fetch(GAS_URL);
+      const res =
+        await fetch(GAS_URL);
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
       if (Array.isArray(data)) {
+
         setSlots(data);
+
       } else {
+
         setSlots([]);
       }
 
     } catch (e) {
+
       console.error(e);
+
       setSlots([]);
+
     } finally {
+
       setLoading(false);
     }
   };
 
   useEffect(() => {
+
     loadSlots();
+
   }, []);
 
   // モーダルを開く
@@ -57,6 +82,7 @@ export default function Page() {
     time: string,
     remain: number
   ) => {
+
     setSelectedTime(time);
 
     setRemaining(remain);
@@ -70,42 +96,145 @@ export default function Page() {
 
   // 予約処理
   const reserve = async () => {
+
     // 二重押し防止
     if (submitting) return;
 
-    // ニックネーム必須
+    // 名前必須
     if (!nickname.trim()) {
-      alert("ニックネームを入力してください");
+
+      alert(
+        "ニックネームを入力してください"
+      );
+
       return;
     }
 
     // 最大4人
     if (groupSize > 4) {
-      alert("1回の予約は4人までです");
+
+      alert(
+        "1回の予約は4人までです"
+      );
+
       return;
     }
 
-    // 残人数超過禁止
+    // 1人未満禁止
+    if (groupSize < 1) {
+
+      alert(
+        "人数が不正です"
+      );
+
+      return;
+    }
+
+    // 残人数超過
     if (groupSize > remaining) {
-      alert("残り人数を超えています");
+
+      alert(
+        "残り人数を超えています"
+      );
+
       return;
     }
 
     try {
+
       setSubmitting(true);
 
-      await fetch("/api/reserve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          time_slot: selectedTime,
-          nickname,
-          group_size: groupSize,
-        }),
-      });
+      const res =
+        await fetch(
+          "/api/reserve",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              time_slot:
+                selectedTime,
+              nickname,
+              group_size:
+                groupSize,
+            }),
+          }
+        );
 
+      const result =
+        await res.text();
+
+      // 名前重複
+      if (
+        result ===
+        "NAME_EXISTS"
+      ) {
+
+        alert(
+          "このニックネームは使用中です"
+        );
+
+        return;
+      }
+
+      // 満席
+      if (result === "FULL") {
+
+        alert("満席です");
+
+        return;
+      }
+
+      // CLOSED
+      if (
+        result === "CLOSED"
+      ) {
+
+        alert(
+          "受付終了しました"
+        );
+
+        return;
+      }
+
+      // 人数超過
+      if (
+        result === "TOO_MANY"
+      ) {
+
+        alert(
+          "1回の予約は4人までです"
+        );
+
+        return;
+      }
+
+      // 不正人数
+      if (
+        result ===
+        "INVALID_GROUP_SIZE"
+      ) {
+
+        alert(
+          "人数が不正です"
+        );
+
+        return;
+      }
+
+      // その他失敗
+      if (result !== "OK") {
+
+        alert(
+          "予約に失敗しました"
+        );
+
+        return;
+      }
+
+      // 成功
       alert("予約完了！");
 
       setShowModal(false);
@@ -113,11 +242,13 @@ export default function Page() {
       loadSlots();
 
     } catch (e) {
+
       console.error(e);
 
       alert("予約失敗");
 
     } finally {
+
       setSubmitting(false);
     }
   };
@@ -150,31 +281,39 @@ export default function Page() {
 
         {/* 読み込み中 */}
         {loading ? (
+
           <div
             style={{
               background: "white",
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              boxShadow:
+                "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             読み込み中...
           </div>
+
         ) : slots.length === 0 ? (
+
           <div
             style={{
               background: "white",
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              boxShadow:
+                "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             現在空きはありません
           </div>
+
         ) : (
+
           slots.map((item, index) => (
+
             <div
               key={index}
               style={{
@@ -182,20 +321,26 @@ export default function Page() {
                 borderRadius: "16px",
                 padding: "20px",
                 marginBottom: "16px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                boxShadow:
+                  "0 2px 8px rgba(0,0,0,0.1)",
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent:
+                  "space-between",
                 alignItems: "center",
               }}
             >
               <div>
+
                 <div
                   style={{
                     fontSize: "24px",
                     fontWeight: "bold",
                   }}
                 >
-                  {item.time_slot.slice(0, 5)}
+                  {item.time_slot.slice(
+                    0,
+                    5
+                  )}
                 </div>
 
                 <div
@@ -204,8 +349,13 @@ export default function Page() {
                     marginTop: "4px",
                   }}
                 >
-                  残り {item.remaining} 人
+                  残り
+                  {" "}
+                  {item.remaining}
+                  {" "}
+                  人
                 </div>
+
               </div>
 
               <button
@@ -220,7 +370,8 @@ export default function Page() {
                   color: "white",
                   border: "none",
                   borderRadius: "12px",
-                  padding: "12px 20px",
+                  padding:
+                    "12px 20px",
                   fontSize: "16px",
                   cursor: "pointer",
                 }}
@@ -234,13 +385,16 @@ export default function Page() {
 
       {/* モーダル */}
       {showModal && (
+
         <div
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.5)",
+            background:
+              "rgba(0,0,0,0.5)",
             display: "flex",
-            justifyContent: "center",
+            justifyContent:
+              "center",
             alignItems: "center",
             padding: "20px",
             zIndex: 1000,
@@ -253,7 +407,8 @@ export default function Page() {
               padding: "24px",
               width: "100%",
               maxWidth: "400px",
-              boxSizing: "border-box",
+              boxSizing:
+                "border-box",
             }}
           >
             <h2
@@ -262,42 +417,69 @@ export default function Page() {
                 marginBottom: "20px",
               }}
             >
-              {selectedTime.slice(0, 5)} の予約
+              {selectedTime.slice(
+                0,
+                5
+              )}
+              {" "}
+              の予約
             </h2>
 
             {/* ニックネーム */}
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ marginBottom: "8px" }}>
+            <div
+              style={{
+                marginBottom: "20px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "8px",
+                }}
+              >
                 ニックネーム
               </div>
 
               <input
                 value={nickname}
                 onChange={(e) =>
-                  setNickname(e.target.value)
+                  setNickname(
+                    e.target.value
+                  )
                 }
                 placeholder="名前を入力"
                 style={{
                   width: "100%",
                   padding: "12px",
-                  borderRadius: "10px",
-                  border: "1px solid #ccc",
+                  borderRadius:
+                    "10px",
+                  border:
+                    "1px solid #ccc",
                   fontSize: "16px",
-                  boxSizing: "border-box",
+                  boxSizing:
+                    "border-box",
                 }}
               />
             </div>
 
             {/* 人数 */}
-            <div style={{ marginBottom: "24px" }}>
-              <div style={{ marginBottom: "8px" }}>
+            <div
+              style={{
+                marginBottom: "24px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "8px",
+                }}
+              >
                 人数
               </div>
 
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
+                  alignItems:
+                    "center",
                   gap: "12px",
                 }}
               >
@@ -305,13 +487,17 @@ export default function Page() {
                 <button
                   onClick={() =>
                     setGroupSize(
-                      Math.max(1, groupSize - 1)
+                      Math.max(
+                        1,
+                        groupSize - 1
+                      )
                     )
                   }
                   style={{
                     width: "40px",
                     height: "40px",
-                    borderRadius: "999px",
+                    borderRadius:
+                      "999px",
                     border: "none",
                     background: "#ddd",
                     fontSize: "24px",
@@ -326,7 +512,8 @@ export default function Page() {
                   style={{
                     fontSize: "24px",
                     minWidth: "40px",
-                    textAlign: "center",
+                    textAlign:
+                      "center",
                   }}
                 >
                   {groupSize}
@@ -335,19 +522,26 @@ export default function Page() {
                 {/* プラス */}
                 <button
                   onClick={() => {
+
                     if (
                       groupSize < 4 &&
-                      groupSize < remaining
+                      groupSize <
+                        remaining
                     ) {
-                      setGroupSize(groupSize + 1);
+
+                      setGroupSize(
+                        groupSize + 1
+                      );
                     }
                   }}
                   style={{
                     width: "40px",
                     height: "40px",
-                    borderRadius: "999px",
+                    borderRadius:
+                      "999px",
                     border: "none",
-                    background: "#2563eb",
+                    background:
+                      "#2563eb",
                     color: "white",
                     fontSize: "24px",
                     cursor: "pointer",
@@ -364,7 +558,9 @@ export default function Page() {
                   fontSize: "14px",
                 }}
               >
-                最大4人まで / 残り{remaining}人
+                最大4人まで / 残り
+                {remaining}
+                人
               </div>
             </div>
 
@@ -377,18 +573,25 @@ export default function Page() {
             >
               {/* キャンセル */}
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() =>
+                  setShowModal(false)
+                }
                 disabled={submitting}
                 style={{
                   flex: 1,
                   padding: "14px",
-                  borderRadius: "12px",
+                  borderRadius:
+                    "12px",
                   border: "none",
                   background: "#ddd",
-                  cursor: submitting
-                    ? "not-allowed"
-                    : "pointer",
-                  opacity: submitting ? 0.5 : 1,
+                  cursor:
+                    submitting
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    submitting
+                      ? 0.5
+                      : 1,
                 }}
               >
                 キャンセル
@@ -401,16 +604,22 @@ export default function Page() {
                 style={{
                   flex: 1,
                   padding: "14px",
-                  borderRadius: "12px",
+                  borderRadius:
+                    "12px",
                   border: "none",
-                  background: submitting
-                    ? "#999"
-                    : "#2563eb",
+                  background:
+                    submitting
+                      ? "#999"
+                      : "#2563eb",
                   color: "white",
-                  cursor: submitting
-                    ? "not-allowed"
-                    : "pointer",
-                  opacity: submitting ? 0.7 : 1,
+                  cursor:
+                    submitting
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    submitting
+                      ? 0.7
+                      : 1,
                 }}
               >
                 {submitting
