@@ -35,9 +35,9 @@ export default function Page() {
 
   // GAS URL
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbwUQ0dHPC5abaZ9SQG_0cTItPOWrM2Qp3uHaNnYC_4CkDwvlrEkRnjmbYbCeUG4Gb7kNw/exec";
+    "https://script.google.com/macros/s/AKfycby_CYCOok9ozm2Kg_bGoCi1NneqrX1Wfw2CkXZaTwymRqPwCDf27AImxPN3bAL_UzUOEA/exec";
 
-  // 空き状況取得
+  // 空き取得
   const loadSlots = async () => {
 
     try {
@@ -77,7 +77,7 @@ export default function Page() {
 
   }, []);
 
-  // モーダルを開く
+  // モーダル開く
   const openReserveModal = (
     time: string,
     remain: number
@@ -94,13 +94,11 @@ export default function Page() {
     setShowModal(true);
   };
 
-  // 予約処理
+  // 予約
   const reserve = async () => {
 
-    // 二重押し防止
     if (submitting) return;
 
-    // 名前必須
     if (!nickname.trim()) {
 
       alert(
@@ -110,27 +108,15 @@ export default function Page() {
       return;
     }
 
-    // 最大4人
     if (groupSize > 4) {
 
       alert(
-        "1回の予約は4人までです"
+        "4人までです"
       );
 
       return;
     }
 
-    // 1人未満禁止
-    if (groupSize < 1) {
-
-      alert(
-        "人数が不正です"
-      );
-
-      return;
-    }
-
-    // 残人数超過
     if (groupSize > remaining) {
 
       alert(
@@ -164,16 +150,18 @@ export default function Page() {
         );
 
       const result =
-        await res.text();
+        (await res.text()).trim();
 
-      // 名前重複
+      console.log(result);
+
+      // 重複
       if (
         result ===
         "NAME_EXISTS"
       ) {
 
         alert(
-          "このニックネームは使用中です"
+          "この名前は既に予約されています"
         );
 
         return;
@@ -193,7 +181,7 @@ export default function Page() {
       ) {
 
         alert(
-          "受付終了しました"
+          "受付終了しています"
         );
 
         return;
@@ -205,36 +193,22 @@ export default function Page() {
       ) {
 
         alert(
-          "1回の予約は4人までです"
+          "4人までです"
         );
 
         return;
       }
 
-      // 不正人数
-      if (
-        result ===
-        "INVALID_GROUP_SIZE"
-      ) {
-
-        alert(
-          "人数が不正です"
-        );
-
-        return;
-      }
-
-      // その他失敗
+      // その他
       if (result !== "OK") {
 
         alert(
-          "予約に失敗しました"
+          "予約失敗: " + result
         );
 
         return;
       }
 
-      // 成功
       alert("予約完了！");
 
       setShowModal(false);
@@ -245,7 +219,7 @@ export default function Page() {
 
       console.error(e);
 
-      alert("予約失敗");
+      alert("通信失敗");
 
     } finally {
 
@@ -279,7 +253,6 @@ export default function Page() {
           整理券予約
         </h1>
 
-        {/* 読み込み中 */}
         {loading ? (
 
           <div
@@ -288,8 +261,6 @@ export default function Page() {
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow:
-                "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             読み込み中...
@@ -303,8 +274,6 @@ export default function Page() {
               borderRadius: "16px",
               padding: "30px",
               textAlign: "center",
-              boxShadow:
-                "0 2px 8px rgba(0,0,0,0.1)",
             }}
           >
             現在空きはありません
@@ -321,8 +290,6 @@ export default function Page() {
                 borderRadius: "16px",
                 padding: "20px",
                 marginBottom: "16px",
-                boxShadow:
-                  "0 2px 8px rgba(0,0,0,0.1)",
                 display: "flex",
                 justifyContent:
                   "space-between",
@@ -343,12 +310,7 @@ export default function Page() {
                   )}
                 </div>
 
-                <div
-                  style={{
-                    color: "#666",
-                    marginTop: "4px",
-                  }}
-                >
+                <div>
                   残り
                   {" "}
                   {item.remaining}
@@ -372,7 +334,6 @@ export default function Page() {
                   borderRadius: "12px",
                   padding:
                     "12px 20px",
-                  fontSize: "16px",
                   cursor: "pointer",
                 }}
               >
@@ -397,7 +358,6 @@ export default function Page() {
               "center",
             alignItems: "center",
             padding: "20px",
-            zIndex: 1000,
           }}
         >
           <div
@@ -407,8 +367,6 @@ export default function Page() {
               padding: "24px",
               width: "100%",
               maxWidth: "400px",
-              boxSizing:
-                "border-box",
             }}
           >
             <h2
@@ -425,7 +383,6 @@ export default function Page() {
               の予約
             </h2>
 
-            {/* ニックネーム */}
             <div
               style={{
                 marginBottom: "20px",
@@ -454,14 +411,10 @@ export default function Page() {
                     "10px",
                   border:
                     "1px solid #ccc",
-                  fontSize: "16px",
-                  boxSizing:
-                    "border-box",
                 }}
               />
             </div>
 
-            {/* 人数 */}
             <div
               style={{
                 marginBottom: "24px",
@@ -483,7 +436,6 @@ export default function Page() {
                   gap: "12px",
                 }}
               >
-                {/* マイナス */}
                 <button
                   onClick={() =>
                     setGroupSize(
@@ -499,15 +451,11 @@ export default function Page() {
                     borderRadius:
                       "999px",
                     border: "none",
-                    background: "#ddd",
-                    fontSize: "24px",
-                    cursor: "pointer",
                   }}
                 >
                   -
                 </button>
 
-                {/* 人数表示 */}
                 <div
                   style={{
                     fontSize: "24px",
@@ -519,7 +467,6 @@ export default function Page() {
                   {groupSize}
                 </div>
 
-                {/* プラス */}
                 <button
                   onClick={() => {
 
@@ -540,38 +487,19 @@ export default function Page() {
                     borderRadius:
                       "999px",
                     border: "none",
-                    background:
-                      "#2563eb",
-                    color: "white",
-                    fontSize: "24px",
-                    cursor: "pointer",
                   }}
                 >
                   +
                 </button>
               </div>
-
-              <div
-                style={{
-                  marginTop: "8px",
-                  color: "#666",
-                  fontSize: "14px",
-                }}
-              >
-                最大4人まで / 残り
-                {remaining}
-                人
-              </div>
             </div>
 
-            {/* ボタン */}
             <div
               style={{
                 display: "flex",
                 gap: "12px",
               }}
             >
-              {/* キャンセル */}
               <button
                 onClick={() =>
                   setShowModal(false)
@@ -583,21 +511,11 @@ export default function Page() {
                   borderRadius:
                     "12px",
                   border: "none",
-                  background: "#ddd",
-                  cursor:
-                    submitting
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity:
-                    submitting
-                      ? 0.5
-                      : 1,
                 }}
               >
                 キャンセル
               </button>
 
-              {/* 予約確定 */}
               <button
                 onClick={reserve}
                 disabled={submitting}
@@ -612,14 +530,6 @@ export default function Page() {
                       ? "#999"
                       : "#2563eb",
                   color: "white",
-                  cursor:
-                    submitting
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity:
-                    submitting
-                      ? 0.7
-                      : 1,
                 }}
               >
                 {submitting
