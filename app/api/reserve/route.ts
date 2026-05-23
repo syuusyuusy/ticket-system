@@ -3,24 +3,25 @@ export async function POST(
 ) {
 
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbwpdEk6rrGHsXW5WwyMRk2ggpULqNT3-WcJYTYFV5oK5QsDiAnAqGH2cGcoUWfAvjK8hQ/exec";
+    "https://script.google.com/macros/s/AKfycbwUQ0dHPC5abaZ9SQG_0cTItPOWrM2Qp3uHaNnYC_4CkDwvlrEkRnjmbYbCeUG4Gb7kNw/exec";
 
   try {
 
     const body =
       await req.json();
 
-    const res = await fetch(
-      GAS_URL,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const res =
+      await fetch(
+        GAS_URL,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
     const text =
       await res.text();
@@ -33,7 +34,9 @@ export async function POST(
 
     return new Response(
       "ERROR",
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
