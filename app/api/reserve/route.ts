@@ -3,14 +3,14 @@ export async function POST(
 ) {
 
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbwUQ0dHPC5abaZ9SQG_0cTItPOWrM2Qp3uHaNnYC_4CkDwvlrEkRnjmbYbCeUG4Gb7kNw/exec";
+    "https://script.google.com/macros/s/AKfycby_CYCOok9ozm2Kg_bGoCi1NneqrX1Wfw2CkXZaTwymRqPwCDf27AImxPN3bAL_UzUOEA/exec";
 
   try {
 
     const body =
       await req.json();
 
-    const res =
+    const gasRes =
       await fetch(
         GAS_URL,
         {
@@ -24,9 +24,16 @@ export async function POST(
       );
 
     const text =
-      await res.text();
+      await gasRes.text();
 
-    return new Response(text);
+    console.log(text);
+
+    return new Response(
+      text,
+      {
+        status: 200,
+      }
+    );
 
   } catch (e) {
 
