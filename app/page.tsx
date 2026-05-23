@@ -35,7 +35,7 @@ export default function Page() {
 
   // GAS URL
   const GAS_URL =
-    "ここにGASのexec URL";
+    "https://script.google.com/macros/s/AKfycbwUQ0dHPC5abaZ9SQG_0cTItPOWrM2Qp3uHaNnYC_4CkDwvlrEkRnjmbYbCeUG4Gb7kNw/exec";
 
   // 空き状況取得
   const loadSlots = async () => {
