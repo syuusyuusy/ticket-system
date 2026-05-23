@@ -1,94 +1,39 @@
-const reserve = async () => {
+export async function POST(
+  req: Request
+) {
 
-  if (submitting) return;
-
-  if (!nickname.trim()) {
-    alert("ニックネームを入力してください");
-    return;
-  }
-
-  if (groupSize > 4) {
-    alert("1回の予約は4人までです");
-    return;
-  }
-
-  if (groupSize > remaining) {
-    alert("残り人数を超えています");
-    return;
-  }
+  const GAS_URL =
+    "https://script.google.com/macros/s/AKfycbwpdEk6rrGHsXW5WwyMRk2ggpULqNT3-WcJYTYFV5oK5QsDiAnAqGH2cGcoUWfAvjK8hQ/exec";
 
   try {
 
-    setSubmitting(true);
+    const body =
+      await req.json();
 
     const res = await fetch(
-      "/api/reserve",
+      GAS_URL,
       {
         method: "POST",
         headers: {
           "Content-Type":
             "application/json",
         },
-        body: JSON.stringify({
-          time_slot: selectedTime,
-          nickname,
-          group_size: groupSize,
-        }),
+        body: JSON.stringify(body),
       }
     );
 
-    const result = await res.text();
+    const text =
+      await res.text();
 
-    // 名前重複
-    if (result === "NAME_EXISTS") {
-
-      alert(
-        "このニックネームは使用中です"
-      );
-
-      return;
-    }
-
-    // 満席
-    if (result === "FULL") {
-
-      alert("満席です");
-
-      return;
-    }
-
-    // CLOSED
-    if (result === "CLOSED") {
-
-      alert("受付終了しました");
-
-      return;
-    }
-
-    // 人数超過
-    if (result === "TOO_MANY") {
-
-      alert(
-        "1回の予約は4人までです"
-      );
-
-      return;
-    }
-
-    alert("予約完了！");
-
-    setShowModal(false);
-
-    loadSlots();
+    return new Response(text);
 
   } catch (e) {
 
     console.error(e);
 
-    alert("予約失敗");
-
-  } finally {
-
-    setSubmitting(false);
+    return new Response(
+      "ERROR",
+      { status: 500 }
+    );
   }
-};
+}
