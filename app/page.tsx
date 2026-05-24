@@ -23,6 +23,7 @@ export default function Page() {
   const [loading, setLoading] =
     useState(true);
 
+  // 予約モーダル
   const [showModal, setShowModal] =
     useState(false);
 
@@ -41,7 +42,7 @@ export default function Page() {
   const [submitting, setSubmitting] =
     useState(false);
 
-  // 確認モーダル
+  // 整理券確認モーダル
   const [showCheckModal, setShowCheckModal] =
     useState(false);
 
@@ -95,7 +96,7 @@ export default function Page() {
 
   }, []);
 
-  // モーダル開く
+  // 予約モーダルを開く
   const openReserveModal = (
     time: string,
     remain: number
@@ -119,7 +120,9 @@ export default function Page() {
 
     if (!nickname.trim()) {
 
-      alert("ニックネームを入力してください");
+      alert(
+        "ニックネームを入力してください"
+      );
 
       return;
     }
@@ -129,26 +132,32 @@ export default function Page() {
       setSubmitting(true);
 
       const res =
-        await fetch("/api/reserve", {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            action: "reserve",
-            time_slot:
-              selectedTime,
-            nickname,
-            group_size:
-              groupSize,
-          }),
-        });
+        await fetch(
+          "/api/reserve",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              action: "reserve",
+              time_slot:
+                selectedTime,
+              nickname,
+              group_size:
+                groupSize,
+            }),
+          }
+        );
 
       const result =
         (await res.text()).trim();
 
-      if (result === "NAME_EXISTS") {
+      if (
+        result ===
+        "NAME_EXISTS"
+      ) {
 
         alert(
           "この名前は既に予約されています"
@@ -242,8 +251,6 @@ export default function Page() {
 
   // キャンセル
   const cancelTicket = async () => {
-
-    if (!ticketData) return;
 
     const ok =
       confirm(
@@ -347,6 +354,7 @@ export default function Page() {
           整理券予約
         </h1>
 
+        {/* 読み込み中 */}
         {loading ? (
 
           <div
@@ -409,7 +417,11 @@ export default function Page() {
                     marginTop: "6px",
                   }}
                 >
-                  残り {item.remaining} 人
+                  残り
+                  {" "}
+                  {item.remaining}
+                  {" "}
+                  人
                 </div>
 
               </div>
@@ -437,6 +449,347 @@ export default function Page() {
           ))
         )}
       </div>
+
+      {/* 予約モーダル */}
+      {showModal && (
+
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background:
+              "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent:
+              "center",
+            alignItems: "center",
+            padding: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: "20px",
+              padding: "24px",
+              width: "100%",
+              maxWidth: "400px",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "24px",
+                marginBottom: "20px",
+              }}
+            >
+              {selectedTime.slice(0, 5)}
+              {" "}
+              の予約
+            </h2>
+
+            {/* ニックネーム */}
+            <input
+              value={nickname}
+              onChange={(e) =>
+                setNickname(
+                  e.target.value
+                )
+              }
+              placeholder="ニックネーム"
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "12px",
+                border:
+                  "1px solid #ccc",
+                fontSize: "16px",
+                boxSizing:
+                  "border-box",
+              }}
+            />
+
+            {/* 人数 */}
+            <div
+              style={{
+                marginTop: "24px",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "12px",
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                }}
+              >
+                人数
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems:
+                    "center",
+                  gap: "16px",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    setGroupSize(
+                      Math.max(
+                        1,
+                        groupSize - 1
+                      )
+                    )
+                  }
+                  style={{
+                    width: "56px",
+                    height: "56px",
+                    borderRadius:
+                      "999px",
+                    border: "none",
+                    background:
+                      "#d1d5db",
+                    fontSize: "32px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  -
+                </button>
+
+                <div
+                  style={{
+                    fontSize: "32px",
+                    fontWeight: "bold",
+                    minWidth: "50px",
+                    textAlign:
+                      "center",
+                  }}
+                >
+                  {groupSize}
+                </div>
+
+                <button
+                  onClick={() => {
+
+                    if (
+                      groupSize < 4 &&
+                      groupSize <
+                        remaining
+                    ) {
+
+                      setGroupSize(
+                        groupSize + 1
+                      );
+                    }
+                  }}
+                  style={{
+                    width: "56px",
+                    height: "56px",
+                    borderRadius:
+                      "999px",
+                    border: "none",
+                    background:
+                      "#2563eb",
+                    color: "white",
+                    fontSize: "32px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "12px",
+                  color: "#666",
+                  fontSize: "15px",
+                }}
+              >
+                最大4人まで / 残り
+                {" "}
+                {remaining}
+                {" "}
+                人
+              </div>
+            </div>
+
+            <button
+              onClick={reserve}
+              disabled={submitting}
+              style={{
+                width: "100%",
+                marginTop: "24px",
+                padding: "14px",
+                background:
+                  submitting
+                    ? "#999"
+                    : "#2563eb",
+                color: "white",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "16px",
+                cursor: submitting
+                  ? "not-allowed"
+                  : "pointer",
+              }}
+            >
+              {submitting
+                ? "予約中..."
+                : "予約確定"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 整理券確認モーダル */}
+      {showCheckModal && (
+
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background:
+              "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent:
+              "center",
+            alignItems: "center",
+            padding: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: "20px",
+              padding: "24px",
+              width: "100%",
+              maxWidth: "400px",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "24px",
+                marginBottom: "20px",
+              }}
+            >
+              整理券確認
+            </h2>
+
+            <input
+              value={checkNickname}
+              onChange={(e) =>
+                setCheckNickname(
+                  e.target.value
+                )
+              }
+              placeholder="ニックネーム"
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "12px",
+                border:
+                  "1px solid #ccc",
+                fontSize: "16px",
+                boxSizing:
+                  "border-box",
+              }}
+            />
+
+            <button
+              onClick={checkTicket}
+              style={{
+                width: "100%",
+                marginTop: "16px",
+                padding: "14px",
+                background: "#2563eb",
+                color: "white",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              確認
+            </button>
+
+            {ticketData && (
+
+              <div
+                style={{
+                  marginTop: "24px",
+                  lineHeight: "2",
+                }}
+              >
+                <div>
+                  整理券番号:
+                  {" "}
+                  {ticketData.ticket_number}
+                </div>
+
+                <div>
+                  時刻:
+                  {" "}
+                  {ticketData.time_slot}
+                </div>
+
+                <div>
+                  人数:
+                  {" "}
+                  {ticketData.group_size}
+                </div>
+
+                <div>
+                  状態:
+                  {" "}
+                  {ticketData.status}
+                </div>
+
+                <button
+                  onClick={cancelTicket}
+                  style={{
+                    width: "100%",
+                    marginTop: "20px",
+                    padding: "14px",
+                    background: "#dc2626",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "12px",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                  }}
+                >
+                  キャンセル
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+
+                setShowCheckModal(false);
+
+                setTicketData(null);
+              }}
+              style={{
+                width: "100%",
+                marginTop: "20px",
+                padding: "14px",
+                background: "#ddd",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
