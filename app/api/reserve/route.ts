@@ -2,7 +2,6 @@ export async function POST(
   req: Request
 ) {
 
-  // GASのexec URL
   const GAS_URL =
     "https://script.google.com/macros/s/AKfycbw2bN8SMdvGkluXbpURkMPz4yt2ZQHgWojRkC2Oy-BJXHn-Cf-A3DxTZYowfv_tuQCX-Q/exec";
 
@@ -11,6 +10,11 @@ export async function POST(
     // フロントから受信
     const body =
       await req.json();
+
+    console.log(
+      "REQUEST BODY:",
+      body
+    );
 
     // GASへ転送
     const gasRes =
@@ -26,7 +30,6 @@ export async function POST(
         }
       );
 
-    // GASレスポンス取得
     const text =
       await gasRes.text();
 
@@ -35,7 +38,6 @@ export async function POST(
       text
     );
 
-    // そのまま返却
     return new Response(
       text,
       {
@@ -48,7 +50,7 @@ export async function POST(
     console.error(e);
 
     return new Response(
-      "ERROR",
+      "SERVER_ERROR",
       {
         status: 500,
       }
