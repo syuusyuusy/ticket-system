@@ -148,10 +148,7 @@ export default function Page() {
       const result =
         (await res.text()).trim();
 
-      if (
-        result ===
-        "NAME_EXISTS"
-      ) {
+      if (result === "NAME_EXISTS") {
 
         alert(
           "この名前は既に予約されています"
@@ -217,7 +214,9 @@ export default function Page() {
         );
 
       const text =
-        await res.text();
+        (await res.text()).trim();
+
+      console.log(text);
 
       if (text === "NOT_FOUND") {
 
@@ -273,7 +272,7 @@ export default function Page() {
         );
 
       const result =
-        await res.text();
+        (await res.text()).trim();
 
       if (result !== "OK") {
 
@@ -287,6 +286,8 @@ export default function Page() {
       setTicketData(null);
 
       setCheckNickname("");
+
+      setShowCheckModal(false);
 
       loadSlots();
 
@@ -314,7 +315,7 @@ export default function Page() {
         }}
       >
 
-        {/* 確認ボタン */}
+        {/* 上ボタン */}
         <button
           onClick={() =>
             setShowCheckModal(true)
@@ -324,10 +325,11 @@ export default function Page() {
             background: "#111827",
             color: "white",
             border: "none",
-            borderRadius: "14px",
-            padding: "16px",
-            fontSize: "16px",
-            marginBottom: "20px",
+            borderRadius: "16px",
+            padding: "18px",
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "24px",
             cursor: "pointer",
           }}
         >
@@ -382,6 +384,8 @@ export default function Page() {
                 borderRadius: "16px",
                 padding: "20px",
                 marginBottom: "16px",
+                boxShadow:
+                  "0 2px 8px rgba(0,0,0,0.1)",
                 display: "flex",
                 justifyContent:
                   "space-between",
@@ -392,22 +396,20 @@ export default function Page() {
 
                 <div
                   style={{
-                    fontSize: "24px",
+                    fontSize: "26px",
                     fontWeight: "bold",
                   }}
                 >
-                  {item.time_slot.slice(
-                    0,
-                    5
-                  )}
+                  {item.time_slot.slice(0, 5)}
                 </div>
 
-                <div>
-                  残り
-                  {" "}
-                  {item.remaining}
-                  {" "}
-                  人
+                <div
+                  style={{
+                    color: "#666",
+                    marginTop: "6px",
+                  }}
+                >
+                  残り {item.remaining} 人
                 </div>
 
               </div>
@@ -419,6 +421,15 @@ export default function Page() {
                     item.remaining
                   )
                 }
+                style={{
+                  background: "#2563eb",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "14px 22px",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                }}
               >
                 予約
               </button>
@@ -426,254 +437,6 @@ export default function Page() {
           ))
         )}
       </div>
-
-      {/* 予約モーダル */}
-      {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background:
-              "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent:
-              "center",
-            alignItems: "center",
-            padding: "20px",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: "20px",
-              padding: "24px",
-              width: "100%",
-              maxWidth: "400px",
-            }}
-          >
-            <h2>
-              {selectedTime.slice(0, 5)}
-              {" "}
-              の予約
-            </h2>
-
-            <input
-              value={nickname}
-              onChange={(e) =>
-                setNickname(
-                  e.target.value
-                )
-              }
-              placeholder="ニックネーム"
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "16px",
-              }}
-            />
-
-            <div
-              style={{
-                marginTop: "20px",
-              }}
-            >
-              最大4人まで / 残り
-              {" "}
-              {remaining}
-              {" "}
-              人
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "16px",
-                marginTop: "16px",
-              }}
-            >
-              <button
-                onClick={() =>
-                  setGroupSize(
-                    Math.max(
-                      1,
-                      groupSize - 1
-                    )
-                  )
-                }
-              >
-                -
-              </button>
-
-              <div>
-                {groupSize}
-              </div>
-
-              <button
-                onClick={() => {
-
-                  if (
-                    groupSize < 4 &&
-                    groupSize <
-                      remaining
-                  ) {
-
-                    setGroupSize(
-                      groupSize + 1
-                    );
-                  }
-                }}
-              >
-                +
-              </button>
-            </div>
-
-            <button
-              onClick={reserve}
-              disabled={submitting}
-              style={{
-                width: "100%",
-                marginTop: "24px",
-                padding: "14px",
-                background:
-                  "#2563eb",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-              }}
-            >
-              {submitting
-                ? "予約中..."
-                : "予約確定"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 確認モーダル */}
-      {showCheckModal && (
-
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background:
-              "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent:
-              "center",
-            alignItems: "center",
-            padding: "20px",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: "20px",
-              padding: "24px",
-              width: "100%",
-              maxWidth: "400px",
-            }}
-          >
-            <h2
-              style={{
-                marginBottom: "20px",
-              }}
-            >
-              整理券確認
-            </h2>
-
-            <input
-              value={checkNickname}
-              onChange={(e) =>
-                setCheckNickname(
-                  e.target.value
-                )
-              }
-              placeholder="ニックネーム"
-              style={{
-                width: "100%",
-                padding: "12px",
-              }}
-            />
-
-            <button
-              onClick={checkTicket}
-              style={{
-                width: "100%",
-                marginTop: "16px",
-                padding: "14px",
-              }}
-            >
-              確認
-            </button>
-
-            {ticketData && (
-
-              <div
-                style={{
-                  marginTop: "24px",
-                }}
-              >
-                <div>
-                  整理券番号:
-                  {" "}
-                  {ticketData.ticket_number}
-                </div>
-
-                <div>
-                  時刻:
-                  {" "}
-                  {ticketData.time_slot}
-                </div>
-
-                <div>
-                  人数:
-                  {" "}
-                  {ticketData.group_size}
-                </div>
-
-                <div>
-                  状態:
-                  {" "}
-                  {ticketData.status}
-                </div>
-
-                <button
-                  onClick={cancelTicket}
-                  style={{
-                    width: "100%",
-                    marginTop: "20px",
-                    padding: "14px",
-                    background: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "12px",
-                  }}
-                >
-                  キャンセル
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={() => {
-
-                setShowCheckModal(false);
-
-                setTicketData(null);
-              }}
-              style={{
-                width: "100%",
-                marginTop: "20px",
-                padding: "14px",
-              }}
-            >
-              閉じる
-            </button>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
