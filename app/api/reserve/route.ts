@@ -7,13 +7,13 @@ export async function POST(
 
   try {
 
-    // 受信
+    // フロントから受信
     const body =
       await req.json();
 
     console.log(body);
 
-    // GASへそのまま転送
+    // そのまま転送
     const gasRes =
       await fetch(
         GAS_URL,
@@ -23,6 +23,8 @@ export async function POST(
             "Content-Type":
               "application/json",
           },
+
+          // ←ここ重要
           body: JSON.stringify(body),
         }
       );
