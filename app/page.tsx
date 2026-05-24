@@ -42,7 +42,7 @@ export default function Page() {
   const [submitting, setSubmitting] =
     useState(false);
 
-  // 整理券確認モーダル
+  // 整理券確認
   const [showCheckModal, setShowCheckModal] =
     useState(false);
 
@@ -96,7 +96,7 @@ export default function Page() {
 
   }, []);
 
-  // 予約モーダルを開く
+  // 予約モーダル
   const openReserveModal = (
     time: string,
     remain: number
@@ -154,6 +154,8 @@ export default function Page() {
       const result =
         (await res.text()).trim();
 
+      console.log(result);
+
       if (
         result ===
         "NAME_EXISTS"
@@ -166,14 +168,29 @@ export default function Page() {
         return;
       }
 
-      if (result === "FULL") {
+      if (
+        result === "FULL"
+      ) {
 
         alert("満席です");
 
         return;
       }
 
-      if (result !== "OK") {
+      if (
+        result === "TOO_MANY"
+      ) {
+
+        alert(
+          "1回の予約は4人までです"
+        );
+
+        return;
+      }
+
+      if (
+        result !== "OK"
+      ) {
 
         alert(
           "予約失敗: " + result
@@ -227,10 +244,24 @@ export default function Page() {
 
       console.log(text);
 
-      if (text === "NOT_FOUND") {
+      if (
+        text === "NOT_FOUND"
+      ) {
 
         alert(
           "予約が見つかりません"
+        );
+
+        return;
+      }
+
+      // JSONじゃない場合
+      if (
+        !text.startsWith("{")
+      ) {
+
+        alert(
+          "取得失敗: " + text
         );
 
         return;
@@ -281,14 +312,20 @@ export default function Page() {
       const result =
         (await res.text()).trim();
 
-      if (result !== "OK") {
+      if (
+        result !== "OK"
+      ) {
 
-        alert("キャンセル失敗");
+        alert(
+          "キャンセル失敗"
+        );
 
         return;
       }
 
-      alert("キャンセルしました");
+      alert(
+        "キャンセルしました"
+      );
 
       setTicketData(null);
 
@@ -322,7 +359,7 @@ export default function Page() {
         }}
       >
 
-        {/* 上ボタン */}
+        {/* 確認ボタン */}
         <button
           onClick={() =>
             setShowCheckModal(true)
@@ -354,7 +391,7 @@ export default function Page() {
           整理券予約
         </h1>
 
-        {/* 読み込み中 */}
+        {/* 読み込み */}
         {loading ? (
 
           <div
@@ -487,7 +524,6 @@ export default function Page() {
               の予約
             </h2>
 
-            {/* ニックネーム */}
             <input
               value={nickname}
               onChange={(e) =>
