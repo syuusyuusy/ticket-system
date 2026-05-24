@@ -7,16 +7,13 @@ export async function POST(
 
   try {
 
-    // フロントから受信
+    // 受信
     const body =
       await req.json();
 
-    console.log(
-      "REQUEST BODY:",
-      body
-    );
+    console.log(body);
 
-    // GASへ転送
+    // GASへそのまま転送
     const gasRes =
       await fetch(
         GAS_URL,
@@ -33,10 +30,7 @@ export async function POST(
     const text =
       await gasRes.text();
 
-    console.log(
-      "GAS RESPONSE:",
-      text
-    );
+    console.log(text);
 
     return new Response(
       text,
