@@ -3,7 +3,7 @@ export async function POST(
 ) {
 
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbzCWfNsp-7gumlNIWhM-TgUd3LV_tfPqtD7w77TSA2jCTdJj0KqfQAnrM5r7OOLtJBD/exec";
+    "https://script.google.com/macros/s/AKfycbxfKwnB664ANt4rm_aGujg_K-V_9wo7hOurSLURWMu8Ss_kvbZV50lhqDhU0brwIxmmtQ/exec";
 
   try {
 
