@@ -58,7 +58,7 @@ export default function Page() {
 
   // GAS URL
   const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbwULF0fpoWAjGlubEem8beeP8ViozQ2YWGhNNj5b61ACAhA7OhwmNvxGWJ4Yuj3eRUQ7Q/exec";
+    "https://script.google.com/macros/s/AKfycbzWnbt2jxsgGblvh0qgra6-WSn7ob-bEp5Mcf6zv19cSld1yEVfsRib7kG-MsAQbf8t0w/exec";
 
   // 空き状況取得
   const loadSlots = async () => {
